@@ -1,0 +1,26 @@
+pipeline {
+    agent any
+    
+    stages {
+        stage('Build') {
+            steps {
+                // Checkout source code from version control
+                git 'https://github.com/dimps-cindy/javawebcal.git'
+                
+                // Build your Java project (e.g., with Maven)
+                sh 'mvn clean package'
+            }
+        }
+        stage('Deploy to Tomcat') {
+            steps {
+                // Navigate to the target directory
+                dir('target') {
+                    // Verify that the WAR file exists
+                    sh 'ls -l' // Add this line for debugging
+                    // Deploy WAR file to Tomcat
+                    deploy adapters: [tomcat7(credentialsId: 'admin', url: 'http://3.15.211.254:8080/')], contextPath: 'web_calculator', war: 'WebAppCal-0.0.6.war'
+                }
+            }
+        }
+    }
+}
